@@ -3,21 +3,29 @@
 
 int main(int argc, char *argv[])
 {
-    const char *driver = argc > 1 ? argv[1] : "SysmonDrv";
+    const char *driver = "SysmonDrv";
     DWORD newStart = 3;
+    BOOL restore = FALSE;
 
-    if (argc > 2) {
-        newStart = (DWORD)atoi(argv[2]);
-        if (newStart > 4) {
-            printf("[-] Invalid Start value (0=Boot, 1=System, 2=Auto, 3=Manual, 4=Disabled)\n");
-            return 1;
+    if (argc > 1 && (_stricmp(argv[1], "restore") == 0 || _stricmp(argv[1], "-r") == 0)) {
+        restore = TRUE;
+        newStart = 0;
+        if (argc > 2) driver = argv[2];
+    } else {
+        if (argc > 1) driver = argv[1];
+        if (argc > 2) {
+            newStart = (DWORD)atoi(argv[2]);
+            if (newStart > 4) {
+                printf("[-] Invalid Start value (0=Boot, 1=System, 2=Auto, 3=Manual, 4=Disabled)\n");
+                return 1;
+            }
         }
     }
 
     char subKey[512];
     _snprintf(subKey, sizeof(subKey), "SYSTEM\\CurrentControlSet\\Services\\%s", driver);
 
-    printf("[*] Target: HKLM\\%s\n", subKey);
+    printf("[*] %s: HKLM\\%s\n", restore ? "Restore" : "Disable", subKey);
 
     HKEY hKey;
     LONG rc = RegOpenKeyExA(HKEY_LOCAL_MACHINE, subKey, 0, KEY_READ | KEY_SET_VALUE, &hKey);
