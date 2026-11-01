@@ -7,6 +7,16 @@ int main(int argc, char *argv[])
     DWORD newStart = 3;
     BOOL restore = FALSE;
 
+    if (argc > 1 && (_stricmp(argv[1], "-h") == 0 || _stricmp(argv[1], "--help") == 0)) {
+        printf("Usage: SysmonDisable.exe [driver] [start_value]\n");
+        printf("       SysmonDisable.exe restore [driver]\n\n");
+        printf("  (no args)          Disable SysmonDrv (Start -> 3/Manual)\n");
+        printf("  <driver> <value>   Set Start for <driver> (0=Boot..4=Disabled)\n");
+        printf("  restore [driver]   Restore driver (Start -> 0/Boot)\n");
+        printf("  -h, --help         Show this help\n");
+        return 0;
+    }
+
     if (argc > 1 && (_stricmp(argv[1], "restore") == 0 || _stricmp(argv[1], "-r") == 0)) {
         restore = TRUE;
         newStart = 0;
